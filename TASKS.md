@@ -95,6 +95,7 @@ Living record of the 0.1.0 build. Status reflects verified work only:
 - ✅ Core commands exercised end-to-end
 - ✅ Redaction verified in all formats
 - ✅ Exit codes stable and tested
-- ⬜ First tagged release cut (maintainer action after CI proves green
-  on the pushed default branch)
+- ✅ First tagged release `v0.1.0` cut: CI green on main (14 jobs), release
+  workflow built + verified (twine check, fresh-venv install + doctor) and
+  published the GitHub release with wheel, sdist and SHA256SUMS.txt
 - ⬜ PyPI listing (blocked on trusted publishing, see above)
