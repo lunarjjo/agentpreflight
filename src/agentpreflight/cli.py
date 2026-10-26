@@ -388,7 +388,24 @@ def cmd_version(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _force_utf8_stdio() -> None:
+    """Guarantee UTF-8 output on every platform and console codepage.
+
+    Windows consoles frequently default to legacy codepages (cp1252/cp437)
+    that cannot encode the typographic characters used in output. Crashing
+    on a decoration character would be unacceptable for a release gate, so
+    stdout/stderr are reconfigured to UTF-8 with replacement before any
+    output happens.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+        except (AttributeError, ValueError, OSError):  # pragma: no cover - exotic streams
+            pass
+
+
 def main(argv: Sequence[str] | None = None) -> int:
+    _force_utf8_stdio()
     parser = build_parser()
     args = parser.parse_args(argv)
 

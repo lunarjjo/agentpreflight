@@ -53,6 +53,7 @@ def run_cli(*args: str, cwd: Path | None = None, env_extra: dict | None = None) 
     """Run the installed CLI as a subprocess (true end-to-end)."""
     env = dict(os.environ)
     env["NO_COLOR"] = "1"
+    env["PYTHONUTF8"] = "1"
     if env_extra:
         env.update(env_extra)
     return subprocess.run(
@@ -60,6 +61,8 @@ def run_cli(*args: str, cwd: Path | None = None, env_extra: dict | None = None) 
         cwd=cwd or REPO_ROOT,
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         env=env,
         timeout=120,
     )
