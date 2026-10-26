@@ -1,0 +1,90 @@
+name: "AgentPreflight"
+description: >-
+  Local-first repository security and pre-release readiness scanner:
+  exposed secrets, sensitive artifacts, insecure defaults and
+  supply-chain hygiene — fully redacted output, zero network access.
+author: "Lunar.JJO"
+branding:
+  icon: "shield"
+  color: "purple"
+
+inputs:
+  path:
+    description: "Directory to scan (relative to the repository root)"
+    required: false
+    default: "."
+  fail-severity:
+    description: "Fail the job when findings exist at or above this severity (critical|high|medium|low|info)"
+    required: false
+    default: "high"
+  severity:
+    description: "Minimum severity to report (critical|high|medium|low|info)"
+    required: false
+    default: "info"
+  history:
+    description: "Also scan full Git history (slower; requires git)"
+    required: false
+    default: "false"
+  sarif:
+    description: "Path to write SARIF output for code scanning (empty = disabled)"
+    required: false
+    default: "agentpreflight.sarif"
+  exclude-rules:
+    description: "Comma-separated rule patterns to exclude (e.g. APF-DEP-002)"
+    required: false
+    default: ""
+
+outputs:
+  findings-count:
+    description: "Number of findings reported"
+    value: ${{ steps.scan.outputs.findings-count }}
+  exit-code:
+    description: "Scanner exit code (1 when findings at/above fail-severity)"
+    value: ${{ steps.scan.outputs.exit-code }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install AgentPreflight
+      shell: bash
+      run: |
+        python -m pip install --quiet "git+${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}@${GITHUB_SHA}"
+    - name: Run scan
+      id: scan
+      shell: bash
+      env:
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_FAIL_SEVERITY: ${{ inputs.fail-severity }}
+        INPUT_SEVERITY: ${{ inputs.severity }}
+        INPUT_HISTORY: ${{ inputs.history }}
+        INPUT_SARIF: ${{ inputs.sarif }}
+        INPUT_EXCLUDE_RULES: ${{ inputs.exclude-rules }}
+      run: |
+        set -euo pipefail
+        args=(scan "$INPUT_PATH" --severity "$INPUT_SEVERITY" --fail-severity "$INPUT_FAIL_SEVERITY" --no-progress)
+        if [ "$INPUT_HISTORY" = "true" ]; then args+=(--history); fi
+        if [ -n "$INPUT_EXCLUDE_RULES" ]; then
+          IFS=',' read -ra RULES <<< "$INPUT_EXCLUDE_RULES"
+          for rule in "${RULES[@]}"; do args+=(--exclude-rule "$rule"); done
+        fi
+        code=0
+        if [ -n "$INPUT_SARIF" ]; then
+          # machine-readable output first (exit code captured), then human summary
+          python -m agentpreflight "${args[@]}" --format sarif --output "$INPUT_SARIF" || code=$?
+          python -m agentpreflight "${args[@]}" --no-progress || true
+        else
+          python -m agentpreflight "${args[@]}" || code=$?
+        fi
+        code=${code:-0}
+        count=$(python - <<'PY'
+        import json, os, pathlib, sys
+        sarif = os.environ.get("INPUT_SARIF", "")
+        n = 0
+        if sarif and pathlib.Path(sarif).exists():
+            n = len(json.loads(pathlib.Path(sarif).read_text())["runs"][0]["results"])
+        print(n)
+        PY
+        )
+        echo "findings-count=$count" >> "$GITHUB_OUTPUT"
+        echo "exit-code=$code" >> "$GITHUB_OUTPUT"
+        exit "$code"

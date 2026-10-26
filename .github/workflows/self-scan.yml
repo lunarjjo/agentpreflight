@@ -1,0 +1,38 @@
+name: Self-scan
+
+# AgentPreflight scans its own repository with its own composite action.
+# This dogfoods both the scanner and the GitHub Action on every push.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: agentpreflight scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write  # required to upload SARIF results
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0  # not required: history scanning is off by default
+
+      - name: Run AgentPreflight (this repo, via its own action)
+        uses: ./ # local composite action — validates action.yml end-to-end
+        with:
+          path: .
+          fail-severity: high
+          sarif: agentpreflight.sarif
+
+      - name: Upload SARIF to code scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@45775bd8235c68ba998cffa5171334d58593da47 # v3.28.15
+        with:
+          sarif_file: agentpreflight.sarif

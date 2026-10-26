@@ -1,0 +1,8 @@
+# Keep local secrets out of the build context.
+.env
+.env.*
+*.pem
+*.key
+.git
+.venv
+__pycache__

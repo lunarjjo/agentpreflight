@@ -1,0 +1,85 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentpreflight"
+version = "0.1.0"
+description = "Local-first repository security and pre-release readiness scanner"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Lunar.JJO" }]
+keywords = [
+  "security",
+  "secret-scanning",
+  "pre-release",
+  "code-scanning",
+  "sarif",
+  "cli",
+  "devsecops",
+  "supply-chain",
+  "repository-hygiene",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Security",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.6",
+  "mypy>=1.10",
+]
+
+[project.scripts]
+agentpreflight = "agentpreflight.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/lunarjjo/agentpreflight"
+Documentation = "https://github.com/lunarjjo/agentpreflight/tree/main/docs"
+Changelog = "https://github.com/lunarjjo/agentpreflight/blob/main/CHANGELOG.md"
+Issues = "https://github.com/lunarjjo/agentpreflight/issues"
+"Release notes" = "https://github.com/lunarjjo/agentpreflight/releases"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+agentpreflight = ["py.typed"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = [
+  "SIM105", # contextlib.suppress is slower than try/except/pass on hot paths
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+files = ["src"]
+warn_unreachable = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

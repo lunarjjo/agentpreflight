@@ -1,0 +1,34 @@
+# Example: AgentPreflight pre-release gate for GitHub Actions.
+# Pin 'uses:' to a release tag/SHA in real projects.
+
+name: security-preflight
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+
+      - name: AgentPreflight
+        uses: lunarjjo/agentpreflight@main  # pin after v0.1.0
+        with:
+          path: .
+          fail-severity: high
+          sarif: agentpreflight.sarif
+
+      - name: Upload SARIF to code scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@45775bd8235c68ba998cffa5171334d58593da47 # v3.28.15
+        with:
+          sarif_file: agentpreflight.sarif

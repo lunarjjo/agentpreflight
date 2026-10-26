@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability report
+    url: https://github.com/lunarjjo/agentpreflight/security/advisories/new
+    about: Please do NOT open public issues for vulnerabilities — use the private advisory form.
+  - name: Documentation
+    url: https://github.com/lunarjjo/agentpreflight/tree/main/docs
+    about: Read the docs before opening a question — false-positive guidance lives there too.

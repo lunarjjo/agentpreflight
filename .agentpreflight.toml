@@ -1,0 +1,41 @@
+# .agentpreflight.toml — AgentPreflight scanning its own repository
+
+# The scanner must pass its own gate (see .github/workflows/self-scan.yml).
+# This file doubles as a live example of documented suppression policy.
+
+[scan]
+severity = "info"
+fail_severity = "high"
+max_file_size = 10485760
+max_files = 50000
+max_commits = 5000
+workers = 0
+
+[output]
+format = "text"
+redact = true
+
+# Test fixtures intentionally embed synthetic credentials and insecure
+# patterns — they MUST match rule patterns for the positive tests to be
+# meaningful. Suppressed with a reason and an expiry so this cannot rot.
+[[ignore]]
+path = "tests/**"
+rule_id = "APF-*"
+reason = "Synthetic fixtures that must match rule patterns (positive tests)."
+expires = "2027-12-31"
+
+# Documentation pages quote synthetic tokens to demonstrate detection and
+# suppression. Most of these carry inline `agentpreflight: allow` markers
+# (dogfooding the inline mechanism); the ones that cannot carry a marker
+# inline are suppressed here.
+[[ignore]]
+path = "docs/**"
+rule_id = "APF-SEC-*"
+reason = "Docs quote synthetic tokens to illustrate detection and suppression."
+expires = "2027-12-31"
+
+[[ignore]]
+path = "README*.md"
+rule_id = "APF-SEC-*"
+reason = "README examples quote synthetic tokens in redacted form."
+expires = "2027-12-31"
