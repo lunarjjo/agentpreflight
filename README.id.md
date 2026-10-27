@@ -8,7 +8,11 @@
 
 **Pemindai keamanan repositori lokal-first dan kesiapan pra-rilis.** AgentPreflight menemukan secret yang terekspos, artefak sensitif, konfigurasi bawaan yang tidak aman, dan risiko higiene supply-chain **sebelum** Anda mempublikasikan, mendeploy, atau merilis — sepenuhnya offline, dengan output yang ter-redaksi, dan **tanpa dependensi runtime**.
 
-> 🇬🇧 **English documentation**: [README.md](README.md)
+<div align="center">
+
+<sub>🌐 <a href="README.md">English</a> · **Bahasa Indonesia**</sub>
+
+</div>
 
 ---
 
