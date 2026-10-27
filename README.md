@@ -8,7 +8,7 @@
 
 **Local-first repository security and pre-release readiness scanner.** AgentPreflight finds exposed secrets, sensitive artifacts, insecure defaults and supply-chain hygiene risks **before** you publish, deploy or release — entirely offline, with redacted output and zero runtime dependencies.
 
-> 🇮🇩 **Dokumentasi bahasa Indonesia**: [README.id.md](README.id.md)
+> 🌐 **Languages / Bahasa**: **English** · [Bahasa Indonesia 🇮🇩](README.id.md) · *more translations welcome*
 
 ---
 
